@@ -29,12 +29,14 @@
 
 #ifdef USE_SEGGER
 // #undef DEBUG_PORT
-#define LOG_DEBUG(...) SEGGER_RTT_printf(0, __VA_ARGS__)
-#define LOG_INFO(...) SEGGER_RTT_printf(0, __VA_ARGS__)
-#define LOG_WARN(...) SEGGER_RTT_printf(0, __VA_ARGS__)
-#define LOG_ERROR(...) SEGGER_RTT_printf(0, __VA_ARGS__)
-#define LOG_CRIT(...) SEGGER_RTT_printf(0, __VA_ARGS__)
-#define LOG_TRACE(...) SEGGER_RTT_printf(0, __VA_ARGS__)
+int cx_SEGGER_RTT_printf(unsigned bufferIndex, const char *sFormat, ...);
+
+#define LOG_DEBUG(...) cx_SEGGER_RTT_printf(0, __VA_ARGS__)
+#define LOG_INFO(...) cx_SEGGER_RTT_printf(0, __VA_ARGS__)
+#define LOG_WARN(...) cx_SEGGER_RTT_printf(0, __VA_ARGS__)
+#define LOG_ERROR(...) cx_SEGGER_RTT_printf(0, __VA_ARGS__)
+#define LOG_CRIT(...) cx_SEGGER_RTT_printf(0, __VA_ARGS__)
+#define LOG_TRACE(...) cx_SEGGER_RTT_printf(0, __VA_ARGS__)
 #else
 #ifdef DEBUG_PORT
 #define LOG_DEBUG(...) DEBUG_PORT.log(MESHTASTIC_LOG_LEVEL_DEBUG, __VA_ARGS__)
@@ -64,7 +66,7 @@
 
 #define LOG_PRIMASK 0x07 /* mask to extract priority part (internal) */
                          /* extract priority */
-#define LOG_PRI(p) ((p)&LOG_PRIMASK)
+#define LOG_PRI(p) ((p) & LOG_PRIMASK)
 #define LOG_MAKEPRI(fac, pri) (((fac) << 3) | (pri))
 
 /* facility codes */
@@ -94,7 +96,7 @@
 #define LOG_NFACILITIES 24 /* current number of facilities */
 #define LOG_FACMASK 0x03f8 /* mask to extract facility part */
                            /* facility of pri */
-#define LOG_FAC(p) (((p)&LOG_FACMASK) >> 3)
+#define LOG_FAC(p) (((p) & LOG_FACMASK) >> 3)
 
 #define LOG_MASK(pri) (1 << (pri))             /* mask for one priority */
 #define LOG_UPTO(pri) ((1 << ((pri) + 1)) - 1) /* all priorities through pri */
@@ -121,35 +123,35 @@
 
 class Syslog
 {
-  private:
-    UDP *_client;
-    IPAddress _ip;
-    const char *_server;
-    uint16_t _port;
-    const char *_deviceHostname;
-    const char *_appName;
-    uint16_t _priDefault;
-    uint8_t _priMask = 0xff;
-    bool _enabled = false;
+private:
+  UDP *_client;
+  IPAddress _ip;
+  const char *_server;
+  uint16_t _port;
+  const char *_deviceHostname;
+  const char *_appName;
+  uint16_t _priDefault;
+  uint8_t _priMask = 0xff;
+  bool _enabled = false;
 
-    bool _sendLog(uint16_t pri, const char *appName, const char *message);
+  bool _sendLog(uint16_t pri, const char *appName, const char *message);
 
-  public:
-    explicit Syslog(UDP &client);
+public:
+  explicit Syslog(UDP &client);
 
-    Syslog &server(const char *server, uint16_t port);
-    Syslog &server(IPAddress ip, uint16_t port);
-    Syslog &deviceHostname(const char *deviceHostname);
-    Syslog &appName(const char *appName);
-    Syslog &defaultPriority(uint16_t pri = LOGLEVEL_KERN);
-    Syslog &logMask(uint8_t priMask);
+  Syslog &server(const char *server, uint16_t port);
+  Syslog &server(IPAddress ip, uint16_t port);
+  Syslog &deviceHostname(const char *deviceHostname);
+  Syslog &appName(const char *appName);
+  Syslog &defaultPriority(uint16_t pri = LOGLEVEL_KERN);
+  Syslog &logMask(uint8_t priMask);
 
-    void enable();
-    void disable();
-    bool isEnabled();
+  void enable();
+  void disable();
+  bool isEnabled();
 
-    bool vlogf(uint16_t pri, const char *fmt, va_list args) __attribute__((format(printf, 3, 0)));
-    bool vlogf(uint16_t pri, const char *appName, const char *fmt, va_list args) __attribute__((format(printf, 3, 0)));
+  bool vlogf(uint16_t pri, const char *fmt, va_list args) __attribute__((format(printf, 3, 0)));
+  bool vlogf(uint16_t pri, const char *appName, const char *fmt, va_list args) __attribute__((format(printf, 3, 0)));
 };
 
 #endif // HAS_ETHERNET || HAS_WIFI

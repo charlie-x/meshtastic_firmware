@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _VARIANT_FEATHER_DIY_
-#define _VARIANT_FEATHER_DIY_
+#ifndef _VARIANT_FANSTEL_XE_
+#define _VARIANT_FANSTEL_XE_
 
 /** Master clock frequency */
 #define VARIANT_MCK (64000000ul)
@@ -37,7 +37,6 @@ extern "C"
 #endif // __cplusplus
 
 #define USE_SEGGER
-
 // Number of pins defined in PinDescription array
 #define PINS_COUNT (48)
 #define NUM_DIGITAL_PINS (48)
@@ -84,10 +83,10 @@ extern "C"
 #define PIN_SPI_SCK (0 + 0)
 
 #define LORA_DIO0 -1        // a No connect on the SX1262/SX1268 module
-#define LORA_RESET (0 + 28) // P0.28 // RST for SX1276, and for SX1262/SX1268
-#define LORA_DIO1 (0 + 32)  // P0.32 // IRQ for SX1262/SX1268
-#define LORA_DIO2 (0 + 26)  // P0.26 // BUSY for SX1262/SX1268
-  // #define LORA_DIO3           // Not connected on PCB, but internally on the TTGO SX1262/SX1268, if DIO3 is high the TXCO is enabled
+#define LORA_RESET (0 + 28) // P1.09 13 // RST for SX1276, and for SX1262/SX1268
+#define LORA_DIO1 (0 + 32)  // P0.06 11  // IRQ for SX1262/SX1268
+#define LORA_DIO2 (0 + 26)  // P0.08 12  // BUSY for SX1262/SX1268
+#define LORA_DIO3           // Not connected on PCB, but internally on the TTGO SX1262/SX1268, if DIO3 is high the TXCO is enabled
 
 #define LORA_SCK PIN_SPI_SCK
 #define LORA_MISO PIN_SPI_MISO
@@ -109,19 +108,16 @@ extern "C"
 #define SX126X_DIO1 LORA_DIO1
 #define SX126X_BUSY LORA_DIO2
 #define SX126X_RESET LORA_RESET
-
-  // #define SX126X_TXEN RADIOLIB_NC
-  // #define SX126X_RXEN (0 + 24) // P0.27 10
-
-#define SX126X_TXEN (0 + 24)
-#define SX126X_RXEN RADIOLIB_NC
-
+  // #define SX126X_RXEN (0 + 27) // P0.27 10
+  // #define SX126X_TXEN (0 + 26) // P0.26 9
   // #define SX126X_DIO3_TCXO_VOLTAGE 1.8
+
+// #define SX126X_TXEN RADIOLIB_NC
+#define SX126X_RXEN (0 + 24) // P0.27 10
 
 #ifdef EBYTE_E22
 // Internally the TTGO module hooks the SX126x-DIO2 in to control the TX/RX switch
 // (which is the default for the sx1262interface code)
-// #define SX126X_DIO2_AS_RF_SWITCH
 #define SX126X_DIO3_TCXO_VOLTAGE 0
 #endif
 

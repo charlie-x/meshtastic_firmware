@@ -40,9 +40,12 @@ Syslog::Syslog(UDP &client)
 
 Syslog &Syslog::server(const char *server, uint16_t port)
 {
-    if (this->_ip.fromString(server)) {
+    if (this->_ip.fromString(server))
+    {
         this->_server = NULL;
-    } else {
+    }
+    else
+    {
         this->_server = server;
     }
     this->_port = port;
@@ -113,7 +116,8 @@ bool Syslog::vlogf(uint16_t pri, const char *appName, const char *fmt, va_list a
     message = new char[initialLen + 1];
 
     len = vsnprintf(message, initialLen + 1, fmt, args);
-    if (len > initialLen) {
+    if (len > initialLen)
+    {
         delete[] message;
         message = new char[len + 1];
 
@@ -144,9 +148,12 @@ inline bool Syslog::_sendLog(uint16_t pri, const char *appName, const char *mess
     if ((pri & LOG_FACMASK) == 0)
         pri = LOG_MAKEPRI(LOG_FAC(this->_priDefault), pri);
 
-    if (this->_server != NULL) {
+    if (this->_server != NULL)
+    {
         result = this->_client->beginPacket(this->_server, this->_port);
-    } else {
+    }
+    else
+    {
         result = this->_client->beginPacket(this->_ip, this->_port);
     }
 
@@ -169,4 +176,47 @@ inline bool Syslog::_sendLog(uint16_t pri, const char *appName, const char *mess
     return true;
 }
 
+#endif
+
+#ifdef USE_SEGGER
+const int BUFFER_SIZE = 512;
+
+/*********************************************************************
+ *
+ *  cx_SEGGER_RTT_vprintf
+ *
+ *  Function description
+ *    Stores a formatted string in SEGGER RTT control block.
+ *    This data is read by the host. Instead of using SEGGER_vprintf it uses the system one
+ *    so that %i and floating point works
+ *
+ *  Parameters
+ *    BufferIndex  Index of "Up"-buffer to be used. (e.g. 0 for "Terminal")
+ *    sFormat      Pointer to format string
+ *    pParamList   Pointer to the list of arguments for the format string
+ *
+ *  Return values
+ *    >= 0:  Number of bytes which have been stored in the "Up"-buffer.
+ *     < 0:  Error
+ */
+int cx_SEGGER_RTT_printf(unsigned bufferIndex, const char *sFormat, ...)
+{
+    char buffer[BUFFER_SIZE]; // Allocate a buffer for the formatted string
+    int r;
+    va_list paramList;
+
+    va_start(paramList, sFormat);
+    // Format the string and store it in 'buffer'
+    r = vsnprintf(buffer, BUFFER_SIZE, sFormat, paramList);
+    va_end(paramList);
+
+    // Check if the formatting was successful
+    if (r > 0)
+    {
+        // If successful, send the formatted string to SEGGER RTT
+        SEGGER_RTT_WriteString(bufferIndex, buffer);
+    }
+
+    return r; // Return the number of characters formatted
+}
 #endif
